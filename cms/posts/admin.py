@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from .models import PostDraft
-from .services import PublishError, publish_post_to_github
+from .services import PublishError, publish_post
 
 
 @admin.register(PostDraft)
@@ -18,12 +18,12 @@ class PostDraftAdmin(admin.ModelAdmin):
         ("审计", {"fields": ("created_at", "updated_at")}),
     )
 
-    @admin.action(description="发布选中文章到 GitHub")
+    @admin.action(description="发布选中文章到站点")
     def publish_selected_posts(self, request, queryset):
         success_count = 0
         for post in queryset:
             try:
-                publish_post_to_github(post)
+                publish_post(post)
                 success_count += 1
             except PublishError as exc:
                 self.message_user(

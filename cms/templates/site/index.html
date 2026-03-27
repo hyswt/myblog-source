@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}skyinfin{% endblock %}
+
+{% block content %}
+  <h1 style="margin-top: 0;">skyinfin</h1>
+  <p class="muted">个人学习博客（Django 动态版）</p>
+  <hr />
+  {% for post in posts %}
+    <article style="padding: 14px 0; border-bottom: 1px solid #e5e7eb;">
+      <h2 style="margin: 0 0 8px;"><a href="/post/{{ post.slug }}/">{{ post.title }}</a></h2>
+      <div class="muted">
+        发布于
+        {% if post.published_at %}
+          {{ post.published_at|date:"Y-m-d H:i" }}
+        {% else %}
+          {{ post.updated_at|date:"Y-m-d H:i" }}
+        {% endif %}
+      </div>
+      {% if post.tags %}
+        <div class="muted" style="margin-top: 6px;">标签：{{ post.tags }}</div>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p>暂无已发布文章。</p>
+  {% endfor %}
+{% endblock %}

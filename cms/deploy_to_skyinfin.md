@@ -1,15 +1,15 @@
-# 绑定到 skyinfin.com（CMS 后台）
+# 绑定到 skyinfin.com（Django 动态站）
 
-目标：让后台写作地址在你的域名下可访问，推荐使用子域名：
+目标：让动态站与后台都在 Django 服务上运行，推荐先使用子域名：
 
-- `cms.skyinfin.com`
+- `cms.skyinfin.com`（先验证）
 
-## 建议架构
+## 建议架构（动态站）
 
-- 现有 Hexo 前台：`www.skyinfin.com`（Vercel）
-- Django CMS：`cms.skyinfin.com`（Render / Railway）
-
-这样最稳定，不会和 Hexo 前台路由冲突。
+- Django 前台+后台：`cms.skyinfin.com`（Railway）
+- 前台首页：`/`
+- 后台控制台：`/cms/`
+- 管理后台：`/admin/`
 
 ## 步骤（Railway）
 
@@ -24,17 +24,17 @@
    - `CMS_ADMIN_USERNAME=admin`
    - `CMS_ADMIN_EMAIL=admin@example.com`
    - `CMS_ADMIN_PASSWORD=<你的后台密码>`
-   - `GITHUB_TOKEN=<可写 myblog-source 的 token>`
-   - `GITHUB_OWNER=hyswt`
-   - `GITHUB_REPO=myblog-source`
-   - `GITHUB_BRANCH=main`
+   - `CMS_SETUP_KEY=<紧急重置管理员的密钥，可选但推荐>`
 5. 给项目添加 PostgreSQL（Railway 插件），并把连接串赋值给 `DATABASE_URL`
 6. 在 Railway 绑定自定义域名 `cms.skyinfin.com`
 7. 在 DNS 增加 CNAME：
    - 主机记录：`cms`
    - 记录值：Railway 提供的目标域名（如 `xxx.up.railway.app`）
-8. 等证书生效后访问：`https://cms.skyinfin.com/`
+8. 等证书生效后访问：
+   - `https://cms.skyinfin.com/`（前台）
+   - `https://cms.skyinfin.com/cms/`（后台）
+   - `https://cms.skyinfin.com/admin/`（Django Admin）
 
 ## 说明
 
-如果你坚持使用 `https://www.skyinfin.com/cms/` 这种“路径挂载”，需要网关反向代理（例如 Cloudflare Worker / Nginx），复杂度更高，不建议作为第一版。
+如果要把主域名切到 Django 动态站，可在验证稳定后把 `www.skyinfin.com` 也指向 Railway；否则先保留现网，使用 `cms.skyinfin.com` 进行在线写作与预览。

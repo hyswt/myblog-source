@@ -125,11 +125,12 @@
         <div class="topbar">
           <div class="brand">Skyinfin CMS</div>
           <div class="nav">
-            <a href="/">控制台</a>
-            <a href="/posts/new/">新建文章</a>
+            <a href="/cms/">控制台</a>
+            <a href="/cms/posts/new/">新建文章</a>
+            <a href="/">前台首页</a>
             <a href="/admin/">Django Admin</a>
             <span class="username">当前用户：{{ request.user.username }}</span>
-            <form class="logout-form" method="post" action="/logout/">
+            <form class="logout-form" method="post" action="/cms/logout/">
               {% csrf_token %}
               <button class="logout-btn" type="submit">安全退出</button>
             </form>

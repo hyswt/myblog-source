@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <article>
+    <h1 style="margin-top: 0;">{{ post.title }}</h1>
+    <div class="muted">
+      发布于
+      {% if post.published_at %}
+        {{ post.published_at|date:"Y-m-d H:i" }}
+      {% else %}
+        {{ post.updated_at|date:"Y-m-d H:i" }}
+      {% endif %}
+    </div>
+    {% if post.tags %}
+      <div class="muted" style="margin-top: 6px;">标签：{{ post.tags }}</div>
+    {% endif %}
+    <hr />
+    <div class="post-body">{{ content_html|safe }}</div>
+    <hr />
+    <a href="/">返回首页</a>
+  </article>
+{% endblock %}

@@ -124,7 +124,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 LOGIN_URL = "/admin/login/"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/cms/"
 LOGOUT_REDIRECT_URL = "/admin/login/"
 
 if not DEBUG:

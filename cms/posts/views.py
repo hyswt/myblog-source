@@ -5,10 +5,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.html import mark_safe
 
 from .forms import PostDraftForm
 from .models import PostDraft
-from .services import PublishError, publish_post_to_github
+from .services import PublishError, publish_post, render_markdown_html
 
 
 def setup_admin_view(request):
@@ -85,7 +86,18 @@ def logout_view(request):
         auth_logout(request)
         messages.success(request, "你已安全退出登录。")
         return redirect("/admin/login/")
-    return redirect("/")
+    return redirect("/cms/")
+
+
+def site_index(request):
+    posts = PostDraft.objects.filter(is_published=True).order_by("-published_at", "-updated_at")
+    return render(request, "site/index.html", {"posts": posts})
+
+
+def site_post_detail(request, slug):
+    post = get_object_or_404(PostDraft, slug=slug, is_published=True)
+    content_html = mark_safe(render_markdown_html(post.content_markdown))
+    return render(request, "site/post_detail.html", {"post": post, "content_html": content_html})
 
 
 @login_required
@@ -125,11 +137,11 @@ def post_edit(request, post_id):
 def post_publish(request, post_id):
     post = get_object_or_404(PostDraft, pk=post_id)
     if request.method != "POST":
-        return redirect("posts:dashboard")
+        return redirect("/cms/")
 
     try:
-        result = publish_post_to_github(post)
-        messages.success(request, f"发布成功：{result['path']}")
+        result = publish_post(post)
+        messages.success(request, f"发布成功：{result['url']}")
     except PublishError as exc:
         messages.error(request, f"发布失败：{exc}")
 
