@@ -1,4 +1,7 @@
+import os
+
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -6,6 +9,74 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import PostDraftForm
 from .models import PostDraft
 from .services import PublishError, publish_post_to_github
+
+
+def setup_admin_view(request):
+    setup_key = (os.getenv("CMS_SETUP_KEY") or "").strip()
+    if not setup_key:
+        return render(
+            request,
+            "posts/setup_admin.html",
+            {
+                "enabled": False,
+                "error": "服务端未配置 CMS_SETUP_KEY，无法使用初始化功能。",
+            },
+        )
+
+    key = (request.GET.get("key") or request.POST.get("key") or "").strip()
+    if key != setup_key:
+        return render(
+            request,
+            "posts/setup_admin.html",
+            {
+                "enabled": True,
+                "error": "密钥无效。请在地址中携带正确 key 参数。",
+            },
+            status=403,
+        )
+
+    if request.method == "POST":
+        username = (request.POST.get("username") or "admin").strip()
+        email = (request.POST.get("email") or "admin@example.com").strip()
+        password = (request.POST.get("password") or "").strip()
+
+        if not username or not password:
+            return render(
+                request,
+                "posts/setup_admin.html",
+                {
+                    "enabled": True,
+                    "key": key,
+                    "error": "用户名和密码不能为空。",
+                    "username": username,
+                    "email": email,
+                },
+                status=400,
+            )
+
+        User = get_user_model()
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={"email": email, "is_staff": True, "is_superuser": True},
+        )
+        user.email = email
+        user.is_staff = True
+        user.is_superuser = True
+        user.is_active = True
+        user.set_password(password)
+        user.save()
+
+        return render(
+            request,
+            "posts/setup_admin.html",
+            {
+                "enabled": True,
+                "key": key,
+                "success": f"管理员已{'创建' if created else '更新'}：{username}",
+            },
+        )
+
+    return render(request, "posts/setup_admin.html", {"enabled": True, "key": key})
 
 
 @login_required

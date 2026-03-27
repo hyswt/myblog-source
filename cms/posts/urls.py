@@ -5,6 +5,7 @@ from . import views
 app_name = "posts"
 
 urlpatterns = [
+    path("setup-admin/", views.setup_admin_view, name="setup_admin"),
     path("logout/", views.logout_view, name="logout"),
     path("", views.dashboard, name="dashboard"),
     path("posts/new/", views.post_create, name="post_create"),

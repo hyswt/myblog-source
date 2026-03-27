@@ -48,3 +48,11 @@
 `GITHUB_TOKEN` 需要对目标仓库具备 Contents 写权限。
 
 可参考：`deploy_to_skyinfin.md` 将后台绑定到 `cms.skyinfin.com`。
+
+## 紧急重置管理员（无 Shell）
+
+若无法登录，可在环境变量设置 `CMS_SETUP_KEY`，然后访问：
+
+- `/setup-admin/?key=<CMS_SETUP_KEY>`
+
+在页面中输入新用户名/密码即可重置管理员账号，完成后建议轮换或删除 `CMS_SETUP_KEY`。

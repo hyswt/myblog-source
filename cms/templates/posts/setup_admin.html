@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}初始化管理员{% endblock %}
+
+{% block content %}
+  <div class="login-wrap">
+    <h1 style="margin-top: 0;">初始化管理员</h1>
+    <p class="muted">仅用于紧急重置后台登录账号。完成后请删除或轮换 <code>CMS_SETUP_KEY</code>。</p>
+
+    {% if error %}
+      <div class="msg error">{{ error }}</div>
+    {% endif %}
+    {% if success %}
+      <div class="msg success">{{ success }}</div>
+      <p><a class="btn" href="/admin/login/">前往 Django Admin 登录</a></p>
+    {% endif %}
+
+    {% if enabled %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="key" value="{{ key }}" />
+
+        <label for="username">用户名</label>
+        <input id="username" type="text" name="username" value="{{ username|default:'admin' }}" />
+
+        <label for="email">邮箱</label>
+        <input id="email" type="text" name="email" value="{{ email|default:'admin@example.com' }}" />
+
+        <label for="password">新密码</label>
+        <input id="password" type="password" name="password" />
+
+        <div style="margin-top: 14px;">
+          <button type="submit">创建/重置管理员</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}
