@@ -1,0 +1,4 @@
+admin:
+  username: your_admin_username
+  password_hash: your_bcrypt_hash
+  secret: replace_with_a_strong_secret

@@ -1,0 +1,39 @@
+backend:
+  name: github
+  repo: hyswt/myblog
+  branch: main
+  base_url: https://www.skyinfin.com
+  auth_endpoint: api/auth
+
+site_url: https://www.skyinfin.com
+display_url: https://www.skyinfin.com
+logo_url: /img/avatar.png
+
+publish_mode: simple
+
+media_folder: source/images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: posts
+    label: 文章
+    folder: source/_posts
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: 标题, name: title, widget: string }
+      - {
+          label: 发布时间,
+          name: date,
+          widget: datetime,
+          format: "YYYY-MM-DD HH:mm:ss",
+          date_format: "YYYY-MM-DD",
+          time_format: "HH:mm:ss"
+        }
+      - { label: 标签, name: tags, widget: list, required: false }
+      - { label: 分类, name: categories, widget: list, required: false }
+      - { label: abbrlink, name: abbrlink, widget: number, required: false, value_type: int }
+      - { label: 草稿, name: draft, widget: boolean, required: false, default: false }
+      - { label: 正文, name: body, widget: markdown }
