@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python manage.py migrate --noinput
-python manage.py collectstatic --noinput
+if [ -f ".venv/bin/python" ]; then
+  PYTHON_BIN=".venv/bin/python"
+  GUNICORN_BIN=".venv/bin/gunicorn"
+else
+  PYTHON_BIN="python"
+  GUNICORN_BIN="gunicorn"
+fi
 
-python - <<'PY'
+"$PYTHON_BIN" manage.py migrate --noinput
+"$PYTHON_BIN" manage.py collectstatic --noinput
+
+"$PYTHON_BIN" - <<'PY'
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
@@ -29,4 +37,4 @@ if username and email and password:
     user.save()
 PY
 
-exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000}
+exec "$GUNICORN_BIN" config.wsgi:application --bind 0.0.0.0:${PORT:-10000}
