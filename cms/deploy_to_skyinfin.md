@@ -13,7 +13,7 @@
 
 ## 步骤（Railway）
 
-1. 将本仓库推送到 GitHub（包含根目录 `railway.json` 与 `nixpacks.toml`）
+1. 将本仓库推送到 GitHub（包含根目录 `railway.json` 与 `Dockerfile`）
 2. 在 Railway 创建项目并选择 `Deploy from GitHub Repo`，连接 `hyswt/myblog-source`
 3. Railway 会按仓库内配置自动构建并启动 Django CMS
 4. 在 Railway 项目变量中配置：
