@@ -1,0 +1,11 @@
+[providers]
+python = "3.11"
+
+[phases.setup]
+nixPkgs = ["python311", "gcc"]
+
+[phases.install]
+cmds = ["cd cms && pip install -r requirements.txt"]
+
+[start]
+cmd = "cd cms && bash start.sh"

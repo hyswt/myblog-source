@@ -11,21 +11,29 @@
 
 这样最稳定，不会和 Hexo 前台路由冲突。
 
-## 步骤（Render）
+## 步骤（Railway）
 
-1. 将本仓库推送到 GitHub（包含根目录 `render.yaml`）
-2. 在 Render 里选择 `New +` -> `Blueprint`，连接该仓库并创建
-3. Render 会自动创建：
-   - Web Service：`skyinfin-cms`
-   - PostgreSQL：`skyinfin-cms-db`
-4. 在 Render 控制台补充两个敏感环境变量：
-   - `GITHUB_TOKEN`
-   - `CMS_ADMIN_PASSWORD`
-5. 在 Render 给 Web Service 绑定自定义域名：`cms.skyinfin.com`
-6. 在 DNS 增加 CNAME：
+1. 将本仓库推送到 GitHub（包含根目录 `railway.json` 与 `nixpacks.toml`）
+2. 在 Railway 创建项目并选择 `Deploy from GitHub Repo`，连接 `hyswt/myblog-source`
+3. Railway 会按仓库内配置自动构建并启动 Django CMS
+4. 在 Railway 项目变量中配置：
+   - `DJANGO_SECRET_KEY`（随机强密钥）
+   - `DJANGO_DEBUG=false`
+   - `DJANGO_ALLOWED_HOSTS=cms.skyinfin.com,127.0.0.1,localhost`
+   - `DJANGO_CSRF_TRUSTED_ORIGINS=https://cms.skyinfin.com`
+   - `CMS_ADMIN_USERNAME=admin`
+   - `CMS_ADMIN_EMAIL=admin@example.com`
+   - `CMS_ADMIN_PASSWORD=<你的后台密码>`
+   - `GITHUB_TOKEN=<可写 myblog-source 的 token>`
+   - `GITHUB_OWNER=hyswt`
+   - `GITHUB_REPO=myblog-source`
+   - `GITHUB_BRANCH=main`
+5. 给项目添加 PostgreSQL（Railway 插件），并把连接串赋值给 `DATABASE_URL`
+6. 在 Railway 绑定自定义域名 `cms.skyinfin.com`
+7. 在 DNS 增加 CNAME：
    - 主机记录：`cms`
-   - 记录值：Render 提供的目标域名（如 `xxx.onrender.com`）
-7. 等证书生效后访问：`https://cms.skyinfin.com/`
+   - 记录值：Railway 提供的目标域名（如 `xxx.up.railway.app`）
+8. 等证书生效后访问：`https://cms.skyinfin.com/`
 
 ## 说明
 
