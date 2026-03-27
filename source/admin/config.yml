@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: hyswt/myblog
+  repo: hyswt/myblog-source
   branch: main
   base_url: https://www.skyinfin.com
   auth_endpoint: api/auth
