@@ -6,3 +6,7 @@ node_modules/
 public/
 .deploy*/
 _multiconfig.yml
+cms/db.sqlite3
+cms/__pycache__/
+cms/**/__pycache__/
+cms/.venv/

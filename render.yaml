@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: skyinfin-cms
+    runtime: python
+    rootDir: cms
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "cms.skyinfin.com,127.0.0.1,localhost"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://cms.skyinfin.com"
+      - key: GITHUB_OWNER
+        value: "hyswt"
+      - key: GITHUB_REPO
+        value: "myblog-source"
+      - key: GITHUB_BRANCH
+        value: "main"
+      - key: CMS_ADMIN_USERNAME
+        value: "admin"
+      - key: CMS_ADMIN_EMAIL
+        value: "admin@example.com"
+      - key: CMS_ADMIN_PASSWORD
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skyinfin-cms-db
+          property: connectionString
+
+databases:
+  - name: skyinfin-cms-db

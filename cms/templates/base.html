@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Blog CMS{% endblock %}</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px auto; max-width: 1000px; padding: 0 16px; }
+      a { text-decoration: none; }
+      .nav { display: flex; gap: 12px; margin-bottom: 16px; }
+      .msg { padding: 10px 12px; border-radius: 6px; margin: 10px 0; }
+      .msg.success { background: #e7f8ee; color: #155724; }
+      .msg.error { background: #fdecea; color: #8b1f1f; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+      th { background: #f6f6f6; text-align: left; }
+      .right { text-align: right; }
+      .actions { display: flex; gap: 8px; align-items: center; }
+      input[type="text"], input[type="number"], textarea { width: 100%; box-sizing: border-box; padding: 8px; }
+      label { display: block; font-weight: 600; margin: 12px 0 6px; }
+      button { padding: 8px 12px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="/">控制台</a>
+      <a href="/posts/new/">新建文章</a>
+      <a href="/admin/">Django Admin</a>
+      {% if request.user.is_authenticated %}
+        <span>当前用户：{{ request.user.username }}</span>
+        <a href="/accounts/logout/">退出</a>
+      {% endif %}
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </body>
+</html>
