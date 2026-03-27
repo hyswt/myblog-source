@@ -50,18 +50,20 @@ class LoginForm(forms.Form):
         self.user_cache = authenticate(self.request, username=username, password=password)
         if self.user_cache is None:
             # Self-heal admin credentials drift in cloud deployments.
-            # If runtime env credentials match user input, force-sync admin user
-            # and retry authentication with possible usernames.
-            synced_username = self._try_sync_admin_credentials(account=account, password=password)
-            retry_usernames = [username]
-            if synced_username and synced_username not in retry_usernames:
-                retry_usernames.append(synced_username)
-            if "@" in account and account not in retry_usernames:
-                retry_usernames.append(account)
-            for retry_username in retry_usernames:
-                self.user_cache = authenticate(self.request, username=retry_username, password=password)
-                if self.user_cache is not None:
-                    break
+            # If runtime env credentials match user input, sync admin user and
+            # directly accept that user to avoid backend/environment drift.
+            synced_user = self._try_sync_admin_credentials(account=account, password=password)
+            if synced_user is not None:
+                self.user_cache = synced_user
+            else:
+                # Fallback retry path with possible usernames.
+                retry_usernames = [username]
+                if "@" in account and account not in retry_usernames:
+                    retry_usernames.append(account)
+                for retry_username in retry_usernames:
+                    self.user_cache = authenticate(self.request, username=retry_username, password=password)
+                    if self.user_cache is not None:
+                        break
         if self.user_cache is None:
             raise forms.ValidationError("账号或密码错误。")
         if not self.user_cache.is_active:
@@ -74,7 +76,7 @@ class LoginForm(forms.Form):
     def _try_sync_admin_credentials(self, account: str, password: str):
         admin_username = (os.getenv("CMS_ADMIN_USERNAME") or "").strip()
         admin_email = (os.getenv("CMS_ADMIN_EMAIL") or "").strip()
-        admin_password = os.getenv("CMS_ADMIN_PASSWORD") or ""
+        admin_password = (os.getenv("CMS_ADMIN_PASSWORD") or "").strip()
 
         if not admin_username or not admin_password:
             return None
@@ -100,4 +102,6 @@ class LoginForm(forms.Form):
         user.is_active = True
         user.set_password(admin_password)
         user.save()
-        return admin_username
+        # Ensure login() can proceed even when authenticate() was bypassed.
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        return user
