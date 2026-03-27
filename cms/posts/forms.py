@@ -51,9 +51,17 @@ class LoginForm(forms.Form):
         if self.user_cache is None:
             # Self-heal admin credentials drift in cloud deployments.
             # If runtime env credentials match user input, force-sync admin user
-            # and retry authentication once.
-            self._try_sync_admin_credentials(account=account, password=password)
-            self.user_cache = authenticate(self.request, username=username, password=password)
+            # and retry authentication with possible usernames.
+            synced_username = self._try_sync_admin_credentials(account=account, password=password)
+            retry_usernames = [username]
+            if synced_username and synced_username not in retry_usernames:
+                retry_usernames.append(synced_username)
+            if "@" in account and account not in retry_usernames:
+                retry_usernames.append(account)
+            for retry_username in retry_usernames:
+                self.user_cache = authenticate(self.request, username=retry_username, password=password)
+                if self.user_cache is not None:
+                    break
         if self.user_cache is None:
             raise forms.ValidationError("账号或密码错误。")
         if not self.user_cache.is_active:
@@ -69,13 +77,13 @@ class LoginForm(forms.Form):
         admin_password = os.getenv("CMS_ADMIN_PASSWORD") or ""
 
         if not admin_username or not admin_password:
-            return
+            return None
 
         account_lower = account.lower()
         matched_account = account_lower in {admin_username.lower(), admin_email.lower()}
         matched_password = compare_digest(password, admin_password)
         if not (matched_account and matched_password):
-            return
+            return None
 
         User = get_user_model()
         user, _ = User.objects.get_or_create(
@@ -92,3 +100,4 @@ class LoginForm(forms.Form):
         user.is_active = True
         user.set_password(admin_password)
         user.save()
+        return admin_username
