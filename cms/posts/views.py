@@ -1,10 +1,39 @@
 from django.contrib import messages
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import PostDraftForm
+from .forms import LoginForm, PostDraftForm
 from .models import PostDraft
 from .services import PublishError, publish_post_to_github
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("posts:dashboard")
+
+    form = LoginForm(request=request, data=request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.get_user()
+        auth_login(request, user)
+        if form.cleaned_data.get("remember_me"):
+            request.session.set_expiry(7 * 24 * 60 * 60)
+        else:
+            request.session.set_expiry(0)
+        messages.success(request, f"欢迎回来，{user.username}。")
+        next_url = request.GET.get("next") or request.POST.get("next") or "/"
+        return redirect(next_url)
+
+    return render(request, "registration/login.html", {"form": form})
+
+
+@login_required
+def logout_view(request):
+    if request.method == "POST":
+        auth_logout(request)
+        messages.success(request, "你已安全退出登录。")
+        return redirect("/accounts/login/")
+    return redirect("/")
 
 
 @login_required
@@ -53,6 +82,3 @@ def post_publish(request, post_id):
         messages.error(request, f"发布失败：{exc}")
 
     return redirect("posts:dashboard")
-from django.shortcuts import render
-
-# Create your views here.

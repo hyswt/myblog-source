@@ -3,10 +3,30 @@
 {% block title %}登录后台{% endblock %}
 
 {% block content %}
-  <h1>登录后台</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">登录</button>
-  </form>
+  <div class="login-wrap">
+    <h1 style="margin-top: 0;">登录 CMS 后台</h1>
+    <p class="muted">支持用户名或邮箱登录，登录后可新建、编辑并发布文章。</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'/' }}" />
+
+      <label for="{{ form.account.id_for_label }}">{{ form.account.label }}</label>
+      {{ form.account }}
+      {% if form.account.errors %}<div class="msg error">{{ form.account.errors|join:", " }}</div>{% endif %}
+
+      <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+      {{ form.password }}
+      {% if form.password.errors %}<div class="msg error">{{ form.password.errors|join:", " }}</div>{% endif %}
+
+      <div style="margin: 10px 0;">
+        <label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:500;">
+          {{ form.remember_me }} {{ form.remember_me.label }}
+        </label>
+      </div>
+      {% if form.non_field_errors %}
+        <div class="msg error">{{ form.non_field_errors|join:", " }}</div>
+      {% endif %}
+      <button type="submit">登录</button>
+    </form>
+  </div>
 {% endblock %}
