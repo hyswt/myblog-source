@@ -72,9 +72,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+database_url = (os.getenv("DATABASE_URL") or "").strip()
+if not database_url:
+    database_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
 DATABASES = {
     "default": dj_database_url.parse(
-        os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        database_url,
         conn_max_age=600,
         ssl_require=False,
     )
